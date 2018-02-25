@@ -1,7 +1,7 @@
 <?php include('includes/header.php'); ?>
 
 	<div class="jumbotron">
-		<h1 class="text-center">Activate</h1>
+		<h1 class="text-center"><?php activate_user(); ?></h1>
 	</div>
 
-  <?php include('includes/footer.php'); ?>	
+  <?php include('includes/footer.php'); ?>

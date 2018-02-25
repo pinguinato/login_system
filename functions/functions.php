@@ -64,6 +64,11 @@ function username_exists($username){
     }
 }
 
+//manda una mail
+function send_email($email,$subject,$msg,$header){
+  return mail($email,$subject,$msg,$header);
+}
+
 
 ////////////////////////////////////////
 ///// FUNZIONI DI VALIDAZIONE //////////
@@ -154,9 +159,15 @@ function validate_user_registration(){
                 display_validation_errors($error);
             }
         }else{
+
+
+
           // se non ci sono errori di validazione registra
           if(register_user($first_name,$last_name,$username,$email,$password)){
-            echo "user registered";
+            //echo "user registered";
+
+            set_message('<p class="bg-success text-center">Controlla la tua email per il messaggio di attivazione.</p>');
+            redirect("index.php");
           }
         }
     }
@@ -182,7 +193,30 @@ function register_user($first_name,$last_name,$username,$email,$password){
     $sql .= " VALUES ('$first_name','$last_name','$username','$email','$password','$validation_code',0)";
     //var_dump($sql);
     $result = query($sql);
-    return $result;
+    confirm($result);
+    $subject = "Attivazione account";
+    $message = "Per favore clicca qui sotto per attivare il tuo account:
+      http://192.168.33.10/corsophp-diaz/LOGIN/MIO-LOGIN/activate.php?email=$email&code=$validation_code
+    ";
+    $header = "From: noreply@ilmiosito.it";
+    send_email($email,$subject,$message,$header);
+    return true;
+  }
+}
+
+////////////////////////////////////////////////
+///////// ACTIVATE USER FUNCTION ///////////////
+////////////////////////////////////////////////
+
+function activate_user(){
+  if($_SERVER['REQUEST_METHOD'] == "GET"){
+    if(isset($_GET['email'])){
+      $email = clean($_GET['email']);
+      $validation_code = clean($_GET['code']);
+      $sql = '';
+      //echo $email = clean($_GET['email']);
+      //echo $validation_code = clean($_GET['code']);
+    }
   }
 }
 
