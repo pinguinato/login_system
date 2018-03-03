@@ -216,8 +216,18 @@ function activate_user(){
     if(isset($_GET['email'])){
       $email = clean($_GET['email']);
       $validation_code = clean($_GET['code']);
-      $sql = "SELECT id FROM users WHERE email = '".escape($_GET['email'])."' AND validation_code = '".escape($_GET['validation_code'])."'";
+
+      $sql = "SELECT id FROM users WHERE email = '".escape($email)."' AND validation_code = '".escape($validation_code)."'";
+
+      var_dump($sql);
+
+
+
       $result = query($sql);
+
+
+
+
       confirm($result);
       if(row_count($result) == 1){
           echo "<p class='bg-success'>You account has been activated!</p>";
