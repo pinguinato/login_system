@@ -80,6 +80,10 @@ function display_validation_errors($error_message){
     echo '<div class="alert alert-danger">'.$error_message.'</div>';
 }
 
+function display_login_errors($error_message){
+  echo '<div class="alert alert-danger">'.$error_message.'</div>';
+}
+
 
 function validate_user_registration(){
     //minima lunghezza di una stringa
@@ -218,26 +222,119 @@ function activate_user(){
       $validation_code = clean($_GET['code']);
 
       $sql = "SELECT id FROM users WHERE email = '".escape($email)."' AND validation_code = '".escape($validation_code)."'";
-
-      var_dump($sql);
-
-
-
       $result = query($sql);
-
-
-
-
       confirm($result);
       if(row_count($result) == 1){
-          echo "<p class='bg-success'>You account has been activated!</p>";
-      }
+          // varibili solo per far capire il passaggio
+          $the_email = escape($email);
+          $the_validation_code = escape($validation_code);
 
-      //echo $email = clean($_GET['email']);
-      //echo $validation_code = clean($_GET['code']);
+          $sql2 = "UPDATE users SET active = 1, validation_code = 0 WHERE email = '".$the_email."' AND validation_code = '".$the_validation_code."' ";
+          $result2 = query($sql2);
+          confirm($result2);
+
+          set_message("<p class='bg-success'>Il tuo account è stato attivato con successo.</p>");
+          redirect("login.php"); // reindirizzamento alla pagina di login
+      }else{
+        set_message("<p class='bg-danger'>Il tuo account non è stato attivato.</p>");
+        redirect("login.php"); // reindirizzamento alla pagina di login
+      }
     }
   }
 }
+
+
+///////////////////////////////////////////////////
+//////////VALIDATE USER LOGIN /////////////////////
+///////////////////////////////////////////////////
+
+function validate_user_login(){
+  $errors = [];
+  $min = 3;
+  $max = 20;
+
+  if($_SERVER['REQUEST_METHOD'] == 'POST'){
+
+    //echo "FUNZIONA";
+
+    //recupero email e Password
+    $email = clean($_POST['email']);
+    $password = clean($_POST['password']);
+
+    // controllo email vuota
+    if(empty($email)){
+        $errors[] = "Il campo email non può essere vuoto.";
+    }
+    // controllo Password
+    if(empty($password)){
+        $errors[] = "Il campo password non può essere vuoto.";
+    }
+
+    // verifica se l'array degli errori ha qualcosa
+    if(!empty($errors)){
+
+      // ci sono degli errori
+      foreach($errors as $error){
+          // richiamo funzione che stampa gli errori
+          display_login_errors($error);
+      }
+
+
+    }else{
+
+      // loggati
+      echo "NON CI SONO ERRORI, TUTTO OK!";
+
+      if(user_login($email,$password)){
+        redirect("admin.php");
+      }else{
+        display_login_errors("Le tue credenziali non sono corrette!");
+      }
+
+    }
+
+  }
+}
+
+////////////////////////////////////////////////////////
+////////////// USER LOGIN FUNCTION /////////////////////
+////////////////////////////////////////////////////////
+
+function user_login($email,$password){
+    $sql = "SELECT password, id FROM users WHERE email = '".escape($email)."'";
+    $result = query($sql);
+    if(row_count($result) == 1){
+      $row = fetch_data($result);
+      $db_password = $row['password'];
+      // adesso bisogna verificare il campo password perché è crittato
+      // decodifica della password
+      if(md5($password) === $db_password ){
+
+        // salviamo la mail in una sessione
+        $_SESSION['email'] = $email;
+
+        return true;
+      }else{
+        return false; // OK
+      }
+    }else{
+      return false; // OK
+    }
+}
+
+////////////////////////////////////////////////////////
+/////////////// LOGIN FUNCTION /////////////////////////
+////////////////////////////////////////////////////////
+
+function logged_in(){
+  // verifica solo che sia settata l'email per la sessione e ritorna vero
+  if(isset($_SESSION['email'])){
+    return true;
+  }else{
+    return false;
+  }
+}
+
 
 
 ?>
