@@ -1,8 +1,20 @@
 <?php include('includes/header.php'); ?>
 <?php include('includes/nav.php'); ?>
 
+
+
 	<div class="jumbotron">
-		<h1 class="text-center"><?php echo display_message(); ?></h1>
+		<?php
+		//var_dump($_SESSION);
+		?>
+		<h1 class="text-center"><?php
+		if(!$_SESSION){
+			echo "HOME";
+		}else{
+			echo display_message();
+		}
+		?>
+	 </h1>
 	</div>
 
 

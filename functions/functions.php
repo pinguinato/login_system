@@ -260,6 +260,8 @@ function validate_user_login(){
     //recupero email e Password
     $email = clean($_POST['email']);
     $password = clean($_POST['password']);
+    // remeber me
+    $remember = isset($_POST['remember']);
 
     // controllo email vuota
     if(empty($email)){
@@ -285,7 +287,7 @@ function validate_user_login(){
       // loggati
       echo "NON CI SONO ERRORI, TUTTO OK!";
 
-      if(user_login($email,$password)){
+      if(user_login($email,$password,$remember)){
         redirect("admin.php");
       }else{
         display_login_errors("Le tue credenziali non sono corrette!");
@@ -300,7 +302,7 @@ function validate_user_login(){
 ////////////// USER LOGIN FUNCTION /////////////////////
 ////////////////////////////////////////////////////////
 
-function user_login($email,$password){
+function user_login($email,$password,$remember){
     $sql = "SELECT password, id FROM users WHERE email = '".escape($email)."'";
     $result = query($sql);
     if(row_count($result) == 1){
@@ -310,6 +312,11 @@ function user_login($email,$password){
       // decodifica della password
       if(md5($password) === $db_password ){
 
+        // se il parametro remember è settato su ON allora setto un cookie per far funzionare il remeber me
+        if($remember == 'on'){
+          // setto un cookie che durerà per 60 secondi
+          setcookie('email',$email,time() + 86400);
+        }
         // salviamo la mail in una sessione
         $_SESSION['email'] = $email;
 
@@ -328,7 +335,7 @@ function user_login($email,$password){
 
 function logged_in(){
   // verifica solo che sia settata l'email per la sessione e ritorna vero
-  if(isset($_SESSION['email'])){
+  if( isset($_SESSION['email']) || isset($_COOKIE['email']) ){
     return true;
   }else{
     return false;
