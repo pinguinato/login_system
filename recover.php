@@ -1,21 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>Document</title>
-	<link rel="stylesheet" href="css/bootstrap.css">
-	<link rel="stylesheet" href="css/styles.css">
-	<script src="js/jquery.js"></script>
-	<script src="js/bootstrap.js"></script>
-	<script src="js/scripts.js"></script>
-</head>
-<body>
-
-<div class="container">
+<?php include("includes/header.php"); ?>
     <div class="row">
 				<div class="col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3">
 					<div class="alert-placeholder">
-	
+						<?php recover_password(); ?>
 					</div>
 					<div class="panel panel-success">
 						<div class="panel-body">
@@ -37,10 +24,10 @@
 													<input type="submit" name="recover-submit" id="recover-submit" tabindex="2" class="form-control btn btn-success" value="Send Password Reset Link" />
 												</div>
 
-												
+
 											</div>
 										</div>
-										<input type="hidden" class="hide" name="token" id="token" value="">
+										<input type="hidden" class="hide" name="token" id="token" value="<?php echo token_generator(); ?>">
 									</form>
 								</div>
 							</div>
@@ -48,6 +35,4 @@
 					</div>
 				</div>
 			</div>
-	</div>
-</body>
-</html>
+<?php include("includes/footer.php"); ?>

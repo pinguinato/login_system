@@ -76,6 +76,10 @@ function send_email($email,$subject,$msg,$header){
 
 // validazione lato server
 
+function display_success_message($message){
+  echo '<p class="bg-success">'.$message.'</p>';
+}
+
 function display_validation_errors($error_message){
     echo '<div class="alert alert-danger">'.$error_message.'</div>';
 }
@@ -339,6 +343,75 @@ function logged_in(){
     return true;
   }else{
     return false;
+  }
+}
+
+////////////////////////////////////////////////////////
+/////////////// recupero della password /////////////////////////
+////////////////////////////////////////////////////////
+
+
+function recover_password(){
+  if($_SERVER['REQUEST_METHOD'] == "POST"){
+    //var_dump($_SESSION['token']);
+    //var_dump($_POST['token']);
+    // usiamo di nuovo i ltoken token_generator
+    if( isset($_SESSION['token']) && ($_POST['token'] === $_SESSION['token']) ){
+      $email = escape($_POST['email']);
+      //var_dump($email);
+      //var_dump($_POST);
+      //echo "FUNZIONA!!";
+      if(email_exists($email)){
+        $validation_code = md5($email . microtime());
+        setcookie('temp_access_code',$validation_code,time()+60);
+        $sql = "UPDATE users SET validation_code = '".escape($validation_code)."' WHERE email = '".escape($email)."'";
+        $result = query($sql);
+        confirm($result);
+        $subject = "Recupero della password";
+        $message = "Per favore clicca il link qui sotto per recuperare la tua password {$validation_code}:
+
+          http://192.168.33.10/corsophp-diaz/LOGIN/MIO-LOGIN/code.php?email=$email&code=$validation_code
+
+        ";
+        $headers = "From noreply@192.168.33.10";
+          if(send_email($email,$subject,$message,$headers)){
+              set_message("<p class='bg-success'>Per favore controlla la tua email.</p>");
+              redirect("index.php");
+          }else{
+            echo display_validation_errors("Email non inviata");
+          }
+      }else{
+        echo display_validation_errors("Questa email non esiste");
+      }
+    }else{
+      // se il token non viene settato torna alla index
+      redirect("index.php");
+    }
+  }
+}
+
+
+////////////////////////////////////////////////////////
+/////////////// code validation ////////////////////////
+////////////////////////////////////////////////////////
+
+function validate_code(){
+  if(isset($_COOKIE['temp_access_code'])){
+
+    if($_SERVER['REQUEST_METHOD'] == "GET"){
+
+      if(isset($_GET['email']) && isset($_GET['code']) ){
+
+        // TODO: fai qualcosa per la validazione del codice
+
+
+      }
+    }
+
+
+  }else{
+    set_message("<p class='bg-danger'>Il tuo cookie di validazione è scaduto.</p>");
+    redirect("recover.php");
   }
 }
 

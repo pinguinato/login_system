@@ -4,17 +4,8 @@
 
 
 	<div class="jumbotron">
-		<?php
-		//var_dump($_SESSION);
-		?>
-		<h1 class="text-center"><?php
-		if(!$_SESSION){
-			echo "HOME";
-		}else{
-			echo display_message();
-		}
-		?>
-	 </h1>
+		<?php display_message(); ?>
+		<h1 class="text-center"> HOME </h1>
 	</div>
 
 
